@@ -1,11 +1,21 @@
 # Current Version
 
-Faunus Market
+Faunus Market 0.0.0 (Not Published Yet)
 
 -------------------------------------
 
 # Description
 
-Faunus Market is an app market to download, install, update Faunus apps.
+You can easilty install Faunus Market to be able to install all Faunus apps. Faunus Market automatically install dependencies and app. Also you can update apps from Faunus Market.
+
+
+-------------------------------------
+
+# Some Informations
+
+DEVELOPMENT TOOLS:
+-Qt5.7
+-Qt Designer
+-Atlassian JIRA for project management
 
 -------------------------------------
