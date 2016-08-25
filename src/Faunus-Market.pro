@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2016-07-06T12:21:39
+# Project created by QtCreator 2016-08-18T17:12:06
 #
 #-------------------------------------------------
 
@@ -15,9 +15,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    downloader.cpp
+    httpdownload.cpp
 
 HEADERS  += mainwindow.h \
-    downloader.h
+    httpdownload.h
 
 FORMS    += mainwindow.ui
