@@ -27,11 +27,9 @@ public:
     void startRequest(QUrl requestedUrl);
 
 signals:
-    void downloadFinished(bool error);
+    void downloadFinished(int error, QString errorStr);
     void downloadStarted();
     void dataReceived(qint64 bytesRead, qint64 totalBytes);
-
-    void downloadError(int errorCode);
 
 private slots:
     void httpReadyRead();

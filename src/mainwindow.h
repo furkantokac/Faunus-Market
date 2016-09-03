@@ -2,9 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <httpdownload.h>
-#include <QDebug>
 
+#include <httpdownload.h>
+#include <qjsonhandler.h>
+#include <qjsonconfig.h>
+
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 
@@ -17,6 +20,10 @@
 #include <QStringList>
 
 #include <QProgressDialog>
+
+// Downloaded file types
+#define APPLIST 100
+#define APP 101
 
 namespace Ui {
 class MainWindow;
@@ -31,32 +38,30 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_btnInstall_clicked();
-    void on_btnRefresh_clicked();
+    void on_btnInstallApp_clicked();
+    void on_btnRefreshApplist_clicked();
+    void on_btnDownloadApp_clicked();
 
-    void finishDownload(bool error);
+    void finishDownload(int error, QString errorStr);
     void startDownload();
     void updateDownloadProgress(qint64 bytesRead, qint64 totalBytes);
-    void errorDownload(int errorCode);
 
 private:
     Ui::MainWindow *ui;
 
-    bool refreshAppList = true;
-
-    void loadTreeWidget(QTreeWidget *tw, QFile *file);
-    QJsonObject jsonToObject(QFile *f);
-
+    void loadTreeWidget(QTreeWidget *tw);
     void apptop(QTextEdit *txe, QString text);
+    void uiSetEnabled(bool state);
+    void updateStatus(QString msg);
 
-    QProgressBar *downBar;
-    QTextEdit *txeStatus;
+    const QString appsConfigFile = "./cache/apps-config.json";
+
+    QString downloadedAppName;
+    int whatIsDownloaded=0; // Will be assigned defined file types
 
     HttpDownload downloader;
-    const QString downloadDir = "cache";
-    QStringList allSoftwares;
-
-    void uiSetEnabled(bool state);
+    QJsonConfig marketConfig;
+    QJsonHandler appsConfig;
 };
 
 #endif // MAINWINDOW_H

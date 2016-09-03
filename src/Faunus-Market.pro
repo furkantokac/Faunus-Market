@@ -15,9 +15,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    httpdownload.cpp
+    httpdownload.cpp \
+    qjsonconfig.cpp \
+    qjsonhandler.cpp
 
 HEADERS  += mainwindow.h \
-    httpdownload.h
+    httpdownload.h \
+    qjsonconfig.h \
+    qjsonhandler.h
 
 FORMS    += mainwindow.ui

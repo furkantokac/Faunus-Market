@@ -29,9 +29,7 @@ void HttpDownload::httpDownloadFinished()
 
     if (reply->error()) // Means connection closed cause of error
     {
-        qDebug() << "ERROR!";
-        qDebug() << reply->errorString();
-        emit downloadFinished(true);
+        emit downloadFinished(2, reply->errorString());
         return;
     }
     else if (!redirectionTarget.isNull()) // Means url redirected
@@ -41,9 +39,8 @@ void HttpDownload::httpDownloadFinished()
         url = url.resolved(redirectionTarget.toUrl());
         reply->deleteLater();
         redirectionCounter++;
-        qDebug() << redirectionCounter << ". time redirecting..";
+        qDebug() << redirectionCounter << ". time redirecting to " + url.toString();
         startRequest(url);
-        redirectionCounter--;
         return;
     }
     else // it means everything is done. You can set some variables from here
@@ -57,11 +54,25 @@ void HttpDownload::httpDownloadFinished()
     delete file;
     file =0;
     manager =0;
-    emit downloadFinished(false);
+    emit downloadFinished(0, "");
 }
 
 void HttpDownload::download(QString requestedUrl, QString fileName, QString dirName)
 {
+    qDebug() << "Requesting "+requestedUrl;
+    // Check internet connection
+    if( isConnectedToInternet() )
+    {
+        // Start to request
+        emit downloadStarted();
+        startRequest(QUrl(requestedUrl));
+    }
+    else
+    {
+        emit downloadFinished(1, "Error 1 : No internet connection.");
+        return;
+    }
+
     // Handle download directory
     if( !QDir(dirName).exists() )
     {
@@ -86,20 +97,7 @@ void HttpDownload::download(QString requestedUrl, QString fileName, QString dirN
     file = new QFile(fullFileName);
     if( !file->open(QIODevice::WriteOnly) )
     {
-        qDebug() << "Unable to write data.";
-        return;
-    }
-
-    if( isConnectedToInternet() )
-    {
-        // Start to request
-        emit downloadStarted();
-        startRequest(QUrl(requestedUrl));
-    }
-    else
-    {
-        qDebug() << "ERROR 1";
-        emit downloadError(1);
+        qDebug() << "Unable to write data to "+fullFileName;
         return;
     }
 }
@@ -136,6 +134,7 @@ void HttpDownload::startRequest(QUrl requestedUrl)
 
 bool HttpDownload::isConnectedToInternet()
 {
+    // TODO: Put timeout. Its waiting too much at loop.exec
     QNetworkAccessManager nam;
     QNetworkRequest req(QUrl("http://www.google.com"));
     QNetworkReply *replyTmp = nam.get(req);

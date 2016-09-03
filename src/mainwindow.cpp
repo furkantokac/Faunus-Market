@@ -1,36 +1,33 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    txeStatus = ui->textEditStatus;
-    downBar = ui->progressBarDownload;
-    downBar->setValue(0);
-
     // When reply emit finished signal, run httpDownloadFinished function
     connect(&downloader, SIGNAL( dataReceived(qint64,qint64)),
             this, SLOT( updateDownloadProgress(qint64,qint64) )
             );
 
-    connect(&downloader, SIGNAL( downloadFinished(bool) ),
-            this, SLOT( finishDownload(bool) )
+    connect(&downloader, SIGNAL( downloadFinished(int,QString) ),
+            this, SLOT( finishDownload(int,QString) )
             );
 
     connect(&downloader, SIGNAL( downloadStarted() ),
             this, SLOT( startDownload() )
             );
 
-    connect(&downloader, SIGNAL(downloadError(int) ),
-            this, SLOT( errorDownload(int) )
-            );
+    ui->progressBarDownload->setValue(0);
 
-    // Get the config file of Faunus Market from web
-    refreshAppList = true;
-    downloader.download("https://raw.github.com/furkantokac/Faunus-Config/master/faunus-market-config.json", "", "cache");
+    // Load config files
+    if( appsConfig.load(appsConfigFile) )
+        loadTreeWidget(ui->treeWidgetApps);
+    else
+        updateStatus("Applist couldn't find. Please refresh applist.");
 }
 
 MainWindow::~MainWindow()
@@ -38,61 +35,93 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::errorDownload(int errorCode)
-{
-    switch(errorCode)
-    {
-    case 0:
-        break;
-
-    case 1:
-        qDebug() << "No internet connection.";
-    }
-}
-
-void MainWindow::finishDownload(bool error)
-{
-    uiSetEnabled(true);
-    ui->progressBarDownload->setValue(0);
-    if( error )
-        qDebug() << "Download cancelled.";
-    else
-    {
-        qDebug() << "Download finished successfuly.";
-        if( refreshAppList )
-        {
-            refreshAppList=false;
-            on_btnRefresh_clicked();
-        }
-    }
-}
-
 void MainWindow::startDownload()
 {
-    qDebug() << "Download started.";
-    uiSetEnabled(false);
+
+}
+
+void MainWindow::finishDownload(int error, QString errorStr)
+{
+    ui->progressBarDownload->setValue(0);
+    if( !error )
+    {
+        qDebug() << "Download finished successfuly.";
+        switch( whatIsDownloaded )
+        {
+        case APPLIST:
+            loadTreeWidget(ui->treeWidgetApps);
+            updateStatus("Latest applist has successfully loaded.");
+            break;
+
+        case APP:
+            updateStatus(downloadedAppName+" has successfully downloaded." );
+            break;
+
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch(error)
+        {
+        case 1:
+            updateStatus(errorStr);
+            break;
+
+        case 2:
+            updateStatus(errorStr);
+            break;
+
+        default:
+            break;
+        }
+    }
+    whatIsDownloaded=0;
+}
+
+void MainWindow::updateStatus(QString msg)
+{
+    apptop(ui->textEditStatus, "-> "+msg);
+    //qDebug() << msg;
 }
 
 void MainWindow::updateDownloadProgress(qint64 bytesRead, qint64 totalBytes)
 {
-    downBar->setMaximum(totalBytes);
-    downBar->setValue(bytesRead);
+    ui->progressBarDownload->setMaximum(totalBytes);
+    ui->progressBarDownload->setValue(bytesRead);
 }
 
-void MainWindow::loadTreeWidget(QTreeWidget *tw, QFile *f)
+void MainWindow::apptop(QTextEdit *txe, QString text)
 {
-    if( !f->open(QIODevice::ReadOnly) )
+    QString oldText = txe->toPlainText();     // or toHtml()
+    txe->setPlainText(text+ "\n" + oldText);  // or setText() or setHtml()
+}
+
+void MainWindow::uiSetEnabled(bool state)
+{
+    ui->btnInstallApp->setEnabled(state);
+    ui->btnRefreshApplist->setEnabled(state);
+    ui->btnUninstallApp->setEnabled(state);
+    ui->btnUpdateApp->setEnabled(state);
+}
+
+void MainWindow::loadTreeWidget(QTreeWidget *tw)
+{
+    if( !appsConfig.load(appsConfigFile) )
     {
-        qDebug() << "Unable to read json file.";
+        updateStatus("Unable to read json file.");
         return;
     }
 
-    QJsonObject json = jsonToObject(f);
-    allSoftwares = json["all-softwares"].toString().split(",");
+    QStringList allSoftwares = appsConfig.getStringList("all-softwares");
+
+    // Clean current items in treeWidget before reload
+    ui->treeWidgetApps->clear();
 
     for(int i=0; i<allSoftwares.size(); i+=1)
     {
-        QStringList theApp = json[ allSoftwares[i] ].toString().split(",");
+        QStringList theApp = appsConfig.getStringList( allSoftwares[i] );
         QTreeWidgetItem *softwares = new QTreeWidgetItem(tw);
         softwares->setText(0, theApp[0]);
         softwares->setText(1, theApp[1]);
@@ -101,48 +130,25 @@ void MainWindow::loadTreeWidget(QTreeWidget *tw, QFile *f)
     }
 }
 
-QJsonObject MainWindow::jsonToObject(QFile *f)
+void MainWindow::on_btnInstallApp_clicked()
 {
-    QByteArray jsonData = f->readAll();
-    QJsonDocument jsonFile = QJsonDocument::fromJson(jsonData);
-    return jsonFile.object();
+
 }
 
-void MainWindow::apptop(QTextEdit *txe, QString text)
+void MainWindow::on_btnRefreshApplist_clicked()
 {
-    QString oldText = txe->toPlainText();       // or toHtml()
-    txe->setPlainText("-> "+text+ "\n" + oldText);    // or setText() or setHtml()
+    whatIsDownloaded = APPLIST;
+    downloader.download(marketConfig.get("apps-config-url"), "", "cache");
+    updateStatus("Downloading latest applist.");
 }
 
-void MainWindow::uiSetEnabled(bool state)
-{
-    ui->btnInstall->setEnabled(state);
-    ui->btnRefresh->setEnabled(state);
-    ui->btnUninstall->setEnabled(state);
-    ui->btnUpdate->setEnabled(state);
-}
-
-void MainWindow::on_btnInstall_clicked()
+void MainWindow::on_btnDownloadApp_clicked()
 {
     QTreeWidgetItem *selectedItem = ui->treeWidgetApps->currentItem();
     if( !selectedItem ) // if there is no item selected, return
         return;
     QString selectedApp = selectedItem->data(0, 0).toString();
-    qDebug() << selectedApp;
-    downloader.download("https://github.com/furkantokac/"+selectedApp+"/archive/master.zip", selectedApp+".zip", "cache");
-    apptop(txeStatus, "Downloading "+selectedApp);
-    //https://github.com/furkantokac/Fchat/archive/master.zip
-    //https://github.com/furkantokac/Fmail/archive/master.zip
-}
-
-void MainWindow::on_btnRefresh_clicked()
-{
-    if( QFile("cache/faunus-market-config.json").exists() )
-    {
-        ui->treeWidgetApps->clear();
-        QFile file("cache/faunus-market-config.json");
-        loadTreeWidget(ui->treeWidgetApps, &file);
-    }
-    else
-        qDebug() << "faunus-market-config.json doesn't exist.";
+    whatIsDownloaded = APP;
+    downloadedAppName = selectedApp;
+    downloader.download(appsConfig.get(selectedApp, 5), selectedApp+".zip", "cache");
 }
