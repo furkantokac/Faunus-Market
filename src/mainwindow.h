@@ -25,6 +25,7 @@
 #define APPLIST 100
 #define APP 101
 
+
 namespace Ui {
 class MainWindow;
 }
@@ -54,14 +55,19 @@ private:
     void uiSetEnabled(bool state);
     void updateStatus(QString msg);
 
-    const QString appsConfigFile = "./cache/apps-config.json";
-
     QString downloadedAppName;
     int whatIsDownloaded=0; // Will be assigned defined file types
 
     HttpDownload downloader;
     QJsonConfig marketConfig;
     QJsonHandler appsConfig;
+
+    // File Locations and Names
+    const QString appsConfigFile = "./cache/apps-config.json";
+
+    // Faunus Market Constants
+    const int marketVersionCode = 1;
+    const QString marketVersionNo = "0.0.1";
 };
 
 #endif // MAINWINDOW_H

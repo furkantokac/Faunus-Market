@@ -37,8 +37,6 @@ void QJsonConfig::setDefault()
 
     config.write(
                 "{"
-                "\"version-no\": [\"0.0.1\"],"
-                "\"version-code\": [1],"
                 "\"installed-apps\": [\"Faunus Market\"],"
                 "\"installed-deps\": [\"\"],"
                 "\"apps-config-url\": [\"https://raw.github.com/furkantokac/Faunus-Config/master/apps-config.json\"]"
@@ -56,12 +54,16 @@ void QJsonConfig::setDefault()
 
 QStringList QJsonConfig::findInstalledApps()
 {
-
+    QStringList temp;
+    temp.append("");
+    return temp;
 }
 
 QStringList QJsonConfig::findInstalledDeps()
 {
-
+    QStringList temp;
+    temp.append("");
+    return temp;
 }
 
 void QJsonConfig::appInstalled(QString installedAppName)
