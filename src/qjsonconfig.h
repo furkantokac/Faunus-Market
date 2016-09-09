@@ -5,6 +5,7 @@
 
 #include <QDir>
 #include <QStringList>
+#include <QStandardPaths>
 
 class QJsonConfig : public QJsonHandler
 {
@@ -20,9 +21,17 @@ public:
     QStringList findInstalledApps();
     QStringList findInstalledDeps();
 
+    void createDesktopShortcutLinux(QString name, QString comment, QString exec, QString icon);
+
+    QString getDir(QString dirName);
+
 signals:
 
 public slots:
+
+private:
+    QString os;
+    QString faunusDir;
 };
 
 #endif // QJSONCONFIG_H

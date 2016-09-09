@@ -20,6 +20,7 @@
 #include <QStringList>
 
 #include <QProgressDialog>
+#include <QStandardPaths>
 
 // Downloaded file types
 #define APPLIST 100

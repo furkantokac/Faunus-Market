@@ -17,11 +17,13 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     httpdownload.cpp \
     qjsonconfig.cpp \
-    qjsonhandler.cpp
+    qjsonhandler.cpp \
+    foldercompressor.cpp
 
 HEADERS  += mainwindow.h \
     httpdownload.h \
     qjsonconfig.h \
-    qjsonhandler.h
+    qjsonhandler.h \
+    foldercompressor.h
 
 FORMS    += mainwindow.ui
