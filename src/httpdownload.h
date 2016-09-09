@@ -39,7 +39,7 @@ private slots:
 private:
     bool httpRequestAborted;
 
-    int redirectionCounter =0;
+    int redirectionCounter=0;
 
     QNetworkAccessManager *manager;
     QUrl url;

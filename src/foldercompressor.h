@@ -12,7 +12,7 @@ class FolderCompressor : public QObject
 public:
     explicit FolderCompressor(QObject *parent = 0);
 
-    //A recursive function that scans all files inside the source folder
+    //A recursive function that scans all files  inside the source folder
     //and serializes all files in a row of file names and compressed
     //binary data in a single file
     bool compressFolder(QString sourceFolder, QString destinationFile);

@@ -46,7 +46,7 @@ signals:
 public slots:
 
 private:
-    QJsonObject json;
+    QJsonObject json ;
 };
 
 #endif // QJSONHANDLER_H

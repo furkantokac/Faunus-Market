@@ -50,7 +50,7 @@ bool QJsonHandler::save()
 }
 
 // ---BEG GET FUNCTIONS
-// Returns json[key] as stringList
+// Returns json[key] as stringList a
 QStringList QJsonHandler::getStringList(QString key)
 {
     QJsonArray jsonArray = json[key].toArray();

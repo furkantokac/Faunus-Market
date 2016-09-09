@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // When reply emit finished signal, run httpDownloadFinished function
+    // When reply emit finished signal, run httpDownloadFinished function.
     connect(&downloader, SIGNAL( dataReceived(qint64,qint64)),
             this, SLOT( updateDownloadProgress(qint64,qint64) )
             );

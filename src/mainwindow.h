@@ -22,7 +22,7 @@
 #include <QProgressDialog>
 #include <QStandardPaths>
 
-// Downloaded file types
+// Downloaded file types.
 #define APPLIST 100
 #define APP 101
 

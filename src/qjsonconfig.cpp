@@ -58,7 +58,7 @@ void QJsonConfig::setDefault()
     }
     config.close();
 
-    // Functions from QJsonHandler
+    // Functions from QJsonHandlera
     if( load(fileName) )
     {
         qDebug() << "Config file successfuly created and loaded.";

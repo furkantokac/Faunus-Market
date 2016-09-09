@@ -31,7 +31,7 @@ public slots:
 
 private:
     QString os;
-    QString faunusDir;
+    QString faunusDir ;
 };
 
 #endif // QJSONCONFIG_H
